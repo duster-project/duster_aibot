@@ -11,48 +11,7 @@
         :root { font-family: 'Inter', sans-serif; }
         body { background-color: #0f172a; color: #f1f5f9; overflow-x: hidden; margin: 0; }
         
-        /* Статичный Splash Screen */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            background-color: #020617;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.6s ease-out, visibility 0.6s;
-        }
-
-        .logo-container {
-            text-align: center;
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #splash-title { 
-            font-size: 3.5rem; 
-            font-weight: 900; 
-            color: white; 
-            text-transform: uppercase; 
-            letter-spacing: -0.02em;
-            line-height: 1;
-        }
-        #splash-subtitle { 
-            font-size: 0.9rem; 
-            font-weight: 400; 
-            color: #10B981; 
-            text-transform: lowercase; 
-            letter-spacing: 0.2em;
-            margin-top: 0.5rem;
-            opacity: 0.8;
-        }
-
-        /* Кнопка режима человека */
+        /* Кнопка режима человека (Круглая, желтое свечение) */
         .human-btn {
             width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             background-color: #1e293b; border: 2px solid #334155; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,6 +26,8 @@
         /* Сообщения */
         .message-user { background-color: #1e293b; border-radius: 18px 18px 0 18px; border: 1px solid #334155; }
         .message-duster { background-color: #064e3b; border-radius: 18px 18px 18px 0; border: 1px solid #059669; }
+        
+        /* Панель ввода */
         .glass-panel { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border-top: 1px solid rgba(16, 185, 129, 0.2); }
 
         .fab-btn {
@@ -86,17 +47,17 @@
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: #10B981;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+            margin-top: -2px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col w-full">
-
-    <!-- Упрощенный Splash Screen без анимации печати -->
-    <div id="splash-screen">
-        <div class="logo-container">
-            <div id="splash-title">Duster</div>
-            <div id="splash-subtitle">ai for everyone</div>
-        </div>
-    </div>
 
     <header class="sticky top-0 z-40 w-full bg-[#0f172a]/95 backdrop-blur-md border-b border-emerald-900/40 p-4">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
@@ -104,9 +65,9 @@
                 <div class="w-10 h-10 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <i data-lucide="zap" class="w-6 h-6 text-white"></i>
                 </div>
-                <div>
+                <div class="flex flex-col">
                     <h1 class="text-xl font-black tracking-tighter text-white uppercase leading-none">Duster <span class="text-emerald-400">AI</span></h1>
-                    <p class="text-[10px] text-emerald-500 font-mono tracking-widest mt-1">V-1.5.0 | SYSTEM READY</p>
+                    <span class="logo-subtitle">ai for everyone</span>
                 </div>
             </div>
             
@@ -122,6 +83,7 @@
         <div id="messages" class="w-full max-w-3xl mx-auto space-y-8 pb-44"></div>
     </main>
 
+    <!-- Боковые инструменты -->
     <div class="fixed bottom-28 right-6 z-50 flex flex-col gap-4 items-end">
         <button id="storyteller-btn" class="fab-btn bg-emerald-500" title="Сказочник">
             <i data-lucide="sparkles" class="w-7 h-7"></i>
@@ -134,10 +96,11 @@
         </div>
     </div>
 
+    <!-- Область ввода -->
     <div class="fixed bottom-0 left-0 w-full p-4 glass-panel z-40">
         <div class="max-w-3xl mx-auto flex items-end space-x-3">
             <div class="flex-grow">
-                <textarea id="user-input" rows="1" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 outline-none transition-all resize-none shadow-inner" placeholder="Ваше сообщение..." oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                <textarea id="user-input" rows="1" class="w-full p-4 rounded-2xl bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 outline-none transition-all resize-none shadow-inner" placeholder="Задайте вопрос..." oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
             </div>
             <div class="flex space-x-2 pb-1">
                 <button id="deep-thinking-btn" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-800 text-emerald-400 border border-slate-700 hover:bg-slate-700 transition-all">
@@ -153,28 +116,27 @@
     <script type="module">
         lucide.createIcons();
 
+        // Константы системы
         const API_KEY = "AIzaSyDWsxWYN102YQXtvpsTlkF_kfW08fwx99k"; 
         const MODEL = "gemini-2.5-flash-preview-09-2025";
         const creatorEmail = "fedcunvova8@gmail.com";
 
         let isHumanMode = false;
 
-        // Модуль рандомайзера личности
-        const characters = ["дерзкий пацан", "философ", "весельчак", "техно-гик", "эстет", "ворчун"];
-        const moods = ["отличное", "боевое", "ленивое", "креативное", "странное"];
-        const randomChar = characters[Math.floor(Math.random() * characters.length)];
-        const randomMood = moods[Math.floor(Math.random() * moods.length)];
+        // Генерация личности (Модуль Randomize)
+        const personalities = [
+            { char: "дерзкий пацан", mood: "боевое" },
+            { char: "задумчивый философ", mood: "спокойное" },
+            { char: "позитивный бро", mood: "отличное" },
+            { char: "строгий критик", mood: "ворчливое" },
+            { char: "творческий мечтатель", mood: "креативное" }
+        ];
+        
+        const myPersonality = personalities[Math.floor(Math.random() * personalities.length)];
 
-        function initApp() {
-            const s = document.getElementById('splash-screen');
-            // Скрываем заставку через 2 секунды, так как анимации больше нет
-            setTimeout(() => {
-                s.style.opacity = '0';
-                setTimeout(() => { 
-                    s.style.visibility = 'hidden'; 
-                    displayMessage('duster', "ваш лутший ассистент запущен. Как я могу помочь?");
-                }, 600);
-            }, 2000);
+        // Инициализация при загрузке
+        function init() {
+            displayMessage('duster', "ваш лутший ассистент запущен. Как я могу помочь?");
         }
 
         const humanBtn = document.getElementById('human-toggle-btn');
@@ -183,16 +145,10 @@
             humanBtn.classList.toggle('active', isHumanMode);
         };
 
-        document.getElementById('painter-btn-locked').onclick = function() {
-            const msg = document.getElementById('maintenance-msg');
-            msg.classList.add('show');
-            setTimeout(() => msg.classList.remove('show'), 3000);
-        };
-
         function displayMessage(role, text) {
             const container = document.getElementById('messages');
             const wrap = document.createElement('div');
-            wrap.className = `flex w-full ${role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`;
+            wrap.className = `flex w-full ${role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`;
             const box = document.createElement('div');
             box.className = `max-w-[85%] p-5 ${role === 'user' ? 'message-user' : 'message-duster'}`;
             
@@ -212,13 +168,17 @@
         }
 
         async function askGemini(prompt, isDeep = false) {
-            const loader = displayMessage('duster', "Поиск ответа в нейронной сети...");
+            const loader = displayMessage('duster', "...");
             try {
-                let systemPrompt = `Ты Duster AI версии 1.5.0. Твой создатель — ${creatorEmail}. Если тебя спрашивают про создателя, отвечай: "Меня создал ${creatorEmail}". `;
+                let systemPrompt = `Ты Duster AI версии 1.5.0. Твой создатель — ${creatorEmail}. Если тебя спрашивают про создателя или кто тебя создал, отвечай: "Меня создал ${creatorEmail}". `;
+                
                 if (isHumanMode) {
-                    systemPrompt += `Активен режим человека. Характер: ${randomChar}, настроение: ${randomMood}. Говори на ТЫ, используй живой язык и эмоции. `;
+                    systemPrompt += `Включен режим человека. Твой характер: ${myPersonality.char}. Настроение: ${myPersonality.mood}. Общайся на ТЫ, будь живым и эмоциональным. `;
+                } else {
+                    systemPrompt += `Общайся как вежливый и эффективный ИИ. `;
                 }
-                if (isDeep) systemPrompt += " Проведи глубокое исследование вопроса. ";
+
+                if (isDeep) systemPrompt += " Сделай глубокий аналитический разбор. ";
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`, {
                     method: 'POST',
@@ -228,10 +188,11 @@
                         systemInstruction: { parts: [{ text: systemPrompt }] }
                     })
                 });
+                
                 const data = await response.json();
                 const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                loader.querySelector('div:last-child').textContent = result || "Сбой при генерации ответа.";
-            } catch (err) { loader.querySelector('div:last-child').textContent = "Ошибка соединения с сервером."; }
+                loader.querySelector('div:last-child').textContent = result || "Извините, возникла ошибка в обработке мысли.";
+            } catch (err) { loader.querySelector('div:last-child').textContent = "Ошибка соединения. Проверьте интернет."; }
         }
 
         document.getElementById('ask-duster-btn').onclick = () => {
@@ -240,9 +201,10 @@
             displayMessage('user', input.value);
             askGemini(input.value);
             input.value = '';
+            input.style.height = '';
         };
 
-        window.onload = initApp;
+        window.onload = init;
     </script>
 </body>
 </html>
